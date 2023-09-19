@@ -58,3 +58,18 @@ if st.button('Make a YouTube Mix'):
     video_urls = [search_youtube(f"{track['name']} {track['artists'][0]['name']}") for track in tracks_sorted_by_popularity]
     for url in video_urls:
         st.markdown(f'<a href="{url}" target="_blank">{url}</a>', unsafe_allow_html=True)
+
+
+# ... [rest of your code]
+
+# Add a button in Streamlit to create the YouTube mix
+if st.button('Make a YouTube Mix'):
+    video_ids = [search_youtube(f"{track['name']} {track['artists'][0]['name']}") for track in tracks_sorted_by_popularity]
+    
+    # Create a YouTube mix URL
+    first_video_url = f"https://www.youtube.com/watch?v={video_ids[0]}"
+    rest_of_videos = ','.join(video_ids[1:])
+    mix_url = f"{first_video_url}&list={rest_of_videos}"
+    
+    st.markdown(f'<a href="{mix_url}" target="_blank"><button>Open YouTube Mix</button></a>', unsafe_allow_html=True)
+

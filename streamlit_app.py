@@ -5,13 +5,13 @@ import os
 from googleapiclient.discovery import build
 
 # Spotify setup
-client_id = os.environ.get('SPOTIPY_CLIENT_ID')
-client_secret = os.environ.get('SPOTIPY_CLIENT_SECRET')
+client_id = st.secrets['SPOTIFY_CLIENT_ID']
+client_secret = st.secrets['SPOTIPY_CLIENT_SECRET']
 client_credentials_manager = SpotifyClientCredentials(client_id=client_id, client_secret=client_secret)
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 # YouTube setup
-ydevkey = os.environ.get('YOUR_YOUTUBE_API_KEY')
+ydevkey = st.secrets['YOUR_YOUTUBE_API_KEY']
 youtube = build('youtube', 'v3', developerKey=ydevkey)
 
 def search_youtube(track_name):

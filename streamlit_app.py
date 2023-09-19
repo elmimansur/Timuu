@@ -63,7 +63,7 @@ if st.button('Make a YouTube Mix'):
 # ... [rest of your code]
 
 # Add a button in Streamlit to create the YouTube mix
-if st.button('Make a YouTube Mix'):
+if st.button('Make a YouTube Mix2'):
     video_ids = [search_youtube(f"{track['name']} {track['artists'][0]['name']}") for track in tracks_sorted_by_popularity]
     
     # Create a YouTube mix URL

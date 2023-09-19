@@ -20,6 +20,8 @@ def get_tracks_from_year(year, limit=50):
     return tracks
 
 tracks = get_tracks_from_year(year, limit)
+# Sort tracks by popularity in descending order
+tracks_sorted_by_popularity = sorted(tracks, key=lambda x: x['popularity'], reverse=True)
 
 # Custom CSS to set the background color to green
 st.markdown("""
@@ -30,7 +32,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-for track in tracks:
+for track in tracks_sorted_by_popularity:
     album_cover_url = track['album']['images'][1]['url']  # Use a smaller image for the album cover
     
     # Create two columns: one for the image and one for the track details.
@@ -40,4 +42,4 @@ for track in tracks:
         st.image(album_cover_url, width=100)  # Set width to adjust the size of the album cover
     
     with col2:
-        st.write(f"Track: {track['name']} by {track['artists'][0]['name']}")  # Display track details
+        st.write(f"Track: {track['name']} by {track['artists'][0]['name']} (Popularity: {track['popularity']})")  # Display track details with popularity

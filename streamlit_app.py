@@ -29,8 +29,8 @@ flow = Flow.from_client_config(
     scopes=scopes
 )
 
-# Run the console flow
-credentials = flow.run_console()
+# Run the local server flow
+credentials = flow.run_local_server()
 
 # Build the YouTube API client
 youtube = googleapiclient.discovery.build("youtube", "v3", credentials=credentials)

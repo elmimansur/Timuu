@@ -11,11 +11,11 @@ sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 # ... and so on for other keys
 
-youtube_oauth_credentials = st.secrets["installed"]
-# YouTube OAuth setup
+
 scopes = ["https://www.googleapis.com/auth/youtube"]
-flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_config(youtube_oauth_credentials, scopes)
+flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_config(st.secrets["installed"], scopes)
 credentials = flow.run_console()
+
 youtube = googleapiclient.discovery.build("youtube", "v3", credentials=credentials)
 
 def search_youtube(track_name):

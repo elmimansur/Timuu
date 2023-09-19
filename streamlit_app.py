@@ -5,8 +5,8 @@ import os
 from googleapiclient.discovery import build
 
 # Spotify setup
-client_id = os.environ.get('YOUR_CLIENT_ID')
-client_secret = os.environ.get('YOUR_CLIENT_SECRET')
+client_id = os.environ.get('SPOTIPY_CLIENT_ID')
+client_secret = os.environ.get('SPOTIPY_CLIENT_SECRET')
 client_credentials_manager = SpotifyClientCredentials(client_id=client_id, client_secret=client_secret)
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 

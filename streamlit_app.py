@@ -21,14 +21,23 @@ def get_tracks_from_year(year, limit=50):
 
 tracks = get_tracks_from_year(year, limit)
 
+# Custom CSS to set the background color to green
+st.markdown("""
+    <style>
+        body {
+            background-color: #4CAF50;  # This is a shade of green
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
 for track in tracks:
-    album_cover_url = track['album']['images'][0]['url']  # Extract the album cover URL (largest image)
+    album_cover_url = track['album']['images'][1]['url']  # Use a smaller image for the album cover
     
     # Create two columns: one for the image and one for the track details.
-    col1, col2 = st.columns([1, 3])  # Adjust the ratio if needed
+    col1, col2 = st.columns([1, 4])  # Adjust the ratio to make the image column smaller
     
     with col1:
-        st.image(album_cover_url, use_column_width=True)  # Display the album cover
+        st.image(album_cover_url, width=100)  # Set width to adjust the size of the album cover
     
     with col2:
         st.write(f"Track: {track['name']} by {track['artists'][0]['name']}")  # Display track details

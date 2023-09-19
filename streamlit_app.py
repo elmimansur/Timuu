@@ -11,7 +11,8 @@ client_credentials_manager = SpotifyClientCredentials(client_id=client_id, clien
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 # YouTube setup
-youtube = build('youtube', 'v3', developerKey='YOUR_YOUTUBE_API_KEY')
+ydevkey= os.environ.get('YOUR_YOUTUBE_API_KEY')
+youtube = build('youtube', 'v3', developerKey=ydevkey )
 
 def search_youtube(track_name):
     """Search for a track on YouTube and return the video ID."""

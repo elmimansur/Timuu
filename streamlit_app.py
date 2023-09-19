@@ -15,7 +15,7 @@ sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 
 scopes = ["https://www.googleapis.com/auth/youtube"]
-flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_config(st.secrets["installed"], scopes)
+flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_config(st.secrets["web"], scopes)
 credentials = flow.run_console()
 
 youtube = googleapiclient.discovery.build("youtube", "v3", credentials=credentials)

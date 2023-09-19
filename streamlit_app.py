@@ -6,7 +6,6 @@ import os
 client_id = os.environ.get('YOUR_CLIENT_ID')
 client_secret = os.environ.get('YOUR_CLIENT_SECRET')
 
-
 client_credentials_manager = SpotifyClientCredentials(client_id=client_id, client_secret=client_secret)
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
@@ -23,4 +22,13 @@ def get_tracks_from_year(year, limit=50):
 tracks = get_tracks_from_year(year, limit)
 
 for track in tracks:
-    st.write(f"Track: {track['name']} by {track['artists'][0]['name']}")
+    album_cover_url = track['album']['images'][0]['url']  # Extract the album cover URL (largest image)
+    
+    # Create two columns: one for the image and one for the track details.
+    col1, col2 = st.beta_columns([1, 3])  # Adjust the ratio if needed
+    
+    with col1:
+        st.image(album_cover_url, use_column_width=True)  # Display the album cover
+    
+    with col2:
+        st.write(f"Track: {track['name']} by {track['artists'][0]['name']}")  # Display track details

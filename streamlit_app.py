@@ -25,7 +25,7 @@ for track in tracks:
     album_cover_url = track['album']['images'][0]['url']  # Extract the album cover URL (largest image)
     
     # Create two columns: one for the image and one for the track details.
-    col1, col2 = st.beta_columns([1, 3])  # Adjust the ratio if needed
+    col1, col2 = st.columns([1, 3])  # Adjust the ratio if needed
     
     with col1:
         st.image(album_cover_url, use_column_width=True)  # Display the album cover

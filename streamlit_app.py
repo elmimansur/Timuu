@@ -11,15 +11,15 @@ client_credentials_manager = SpotifyClientCredentials(client_id=client_id, clien
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 # YouTube setup
-ydevkey= os.environ.get('YOUR_YOUTUBE_API_KEY')
-youtube = build('youtube', 'v3', developerKey=ydevkey )
+ydevkey = os.environ.get('YOUR_YOUTUBE_API_KEY')
+youtube = build('youtube', 'v3', developerKey=ydevkey)
 
 def search_youtube(track_name):
-    """Search for a track on YouTube and return the video ID."""
+    """Search for a track on YouTube and return the video URL."""
     request = youtube.search().list(q=track_name, part='id', maxResults=1)
     response = request.execute()
     video_id = response['items'][0]['id']['videoId']
-    return video_id
+    return f"https://www.youtube.com/watch?v={video_id}"
 
 st.title("Travel Through Time: A Musical Journey")
 year = st.slider("Select a year to explore music:", 1950, 2020)
@@ -55,6 +55,6 @@ for track in tracks_sorted_by_popularity:
 
 # Add a button in Streamlit to create the YouTube mix
 if st.button('Make a YouTube Mix'):
-    video_ids = [search_youtube(f"{track['name']} {track['artists'][0]['name']}") for track in tracks_sorted_by_popularity]
-    # Here you can add the code to create a YouTube playlist and add the videos to it.
-    st.write(f'YouTube mix created with {len(video_ids)} videos!')
+    video_urls = [search_youtube(f"{track['name']} {track['artists'][0]['name']}") for track in tracks_sorted_by_popularity]
+    for url in video_urls:
+        st.markdown(f'<a href="{url}" target="_blank">{url}</a>', unsafe_allow_html=True)

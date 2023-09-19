@@ -2,7 +2,8 @@ import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import streamlit as st
 import os
-from googleapiclient.discovery import build
+import google_auth_oauthlib.flow
+import googleapiclient.discovery
 
 # Spotify setup
 client_id = os.environ.get('YOUR_CLIENT_ID')
@@ -10,66 +11,58 @@ client_secret = os.environ.get('YOUR_CLIENT_SECRET')
 client_credentials_manager = SpotifyClientCredentials(client_id=client_id, client_secret=client_secret)
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
-# YouTube setup
-ydevkey = os.environ.get('YOUR_YOUTUBE_API_KEY')
-youtube = build('youtube', 'v3', developerKey=ydevkey)
+# YouTube OAuth setup
+scopes = ["https://www.googleapis.com/auth/youtube"]
+flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_secrets_file("path_to_your_credentials.json", scopes)
+credentials = flow.run_console()
+youtube = googleapiclient.discovery.build("youtube", "v3", credentials=credentials)
 
 def search_youtube(track_name):
-    """Search for a track on YouTube and return the video URL."""
     request = youtube.search().list(q=track_name, part='id', maxResults=1)
     response = request.execute()
     video_id = response['items'][0]['id']['videoId']
-    return f"https://www.youtube.com/watch?v={video_id}"
+    return video_id
 
-st.title("Travel Through Time: A Musical Journey")
-year = st.slider("Select a year to explore music:", 1950, 2020)
-limit = st.slider("Number of tracks to fetch:", 10, 50)
-
-def get_tracks_from_year(year, limit=50):
-    query = f'year:{year}'
-    results = sp.search(q=query, type='track', limit=limit)
-    tracks = results['tracks']['items']
-    return tracks
-
-tracks = get_tracks_from_year(year, limit)
-tracks_sorted_by_popularity = sorted(tracks, key=lambda x: x['popularity'], reverse=True)
-
-# Custom CSS to set the background color to green
-st.markdown("""
-    <style>
-        body {
-            background-color: #4CAF50;  # This is a shade of green
+def create_youtube_playlist(title, description=""):
+    request = youtube.playlists().insert(
+        part="snippet,status",
+        body={
+            "snippet": {
+                "title": title,
+                "description": description
+            },
+            "status": {
+                "privacyStatus": "public"
+            }
         }
-    </style>
-    """, unsafe_allow_html=True)
+    )
+    response = request.execute()
+    return response["id"]
 
-for track in tracks_sorted_by_popularity:
-    album_cover_url = track['album']['images'][1]['url']
-    col1, col2 = st.columns([1, 4])
-    
-    with col1:
-        st.image(album_cover_url, width=100)
-    
-    with col2:
-        st.markdown(f"**Track:** {track['name']} \n**Artist:** {track['artists'][0]['name']} (Popularity: {track['popularity']})")
+def add_video_to_playlist(playlist_id, video_id):
+    request = youtube.playlistItems().insert(
+        part="snippet",
+        body={
+            "snippet": {
+                "playlistId": playlist_id,
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": video_id
+                }
+            }
+        }
+    )
+    response = request.execute()
+    return response
 
-# Add a button in Streamlit to create the YouTube mix
-if st.button('Make a YouTube Mix'):
-    video_urls = [search_youtube(f"{track['name']} {track['artists'][0]['name']}") for track in tracks_sorted_by_popularity]
-    for url in video_urls:
-        st.markdown(f'<a href="{url}" target="_blank">{url}</a>', unsafe_allow_html=True)
+# ... [rest of your Streamlit UI code]
 
-
-# ... [rest of your code]
-
-# Add a button in Streamlit to create the YouTube mix
-if st.button('Make a YouTube Mix2'):
+# Add a button in Streamlit to create the YouTube playlist
+if st.button('Make a YouTube Playlist'):
+    playlist_id = create_youtube_playlist(f"Music from {year}")
     video_ids = [search_youtube(f"{track['name']} {track['artists'][0]['name']}") for track in tracks_sorted_by_popularity]
     
-    # Create a YouTube mix URL
-    first_video_url = f"https://www.youtube.com/watch?v={video_ids[0]}"
-    rest_of_videos = ','.join(video_ids[1:])
-    mix_url = f"{first_video_url}&list={rest_of_videos}"
+    for video_id in video_ids:
+        add_video_to_playlist(playlist_id, video_id)
     
-    st.markdown(f'<a href="{mix_url}" target="_blank"><button>Open YouTube Mix</button></a>', unsafe_allow_html=True)
-
+    st.markdown(f'YouTube playlist created! [View Playlist](https://www.youtube.com/playlist?list={playlist_id})', unsafe_allow_html=True)

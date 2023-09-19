@@ -3,6 +3,8 @@ from spotipy.oauth2 import SpotifyClientCredentials
 import streamlit as st
 import googleapiclient.discovery
 import google_auth_oauthlib.flow
+from google_auth_oauthlib.flow import Flow
+import googleapiclient.discovery
 
 
 # Spotify setup
@@ -14,10 +16,23 @@ sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 # ... and so on for other keys
 
 
+
+
+# Define the scopes
 scopes = ["https://www.googleapis.com/auth/youtube"]
-flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_config(st.secrets["web"], scopes)
+
+# Create the OAuth flow
+flow = Flow.from_client_config(
+    client_config={
+        "web": st.secrets["web"]
+    },
+    scopes=scopes
+)
+
+# Run the console flow
 credentials = flow.run_console()
 
+# Build the YouTube API client
 youtube = googleapiclient.discovery.build("youtube", "v3", credentials=credentials)
 
 def search_youtube(track_name):

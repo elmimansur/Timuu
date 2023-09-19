@@ -20,7 +20,6 @@ def get_tracks_from_year(year, limit=50):
     return tracks
 
 tracks = get_tracks_from_year(year, limit)
-# Sort tracks by popularity in descending order
 tracks_sorted_by_popularity = sorted(tracks, key=lambda x: x['popularity'], reverse=True)
 
 # Custom CSS to set the background color to green
@@ -33,13 +32,16 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 for track in tracks_sorted_by_popularity:
-    album_cover_url = track['album']['images'][1]['url']  # Use a smaller image for the album cover
-    
-    # Create two columns: one for the image and one for the track details.
-    col1, col2 = st.columns([1, 4])  # Adjust the ratio to make the image column smaller
+    album_cover_url = track['album']['images'][1]['url']
+    col1, col2 = st.columns([1, 4])
     
     with col1:
-        st.image(album_cover_url, width=100)  # Set width to adjust the size of the album cover
+        st.image(album_cover_url, width=100)
     
     with col2:
-        st.write(f"Track: {track['name']} by {track['artists'][0]['name']} (Popularity: {track['popularity']})")  # Display track details with popularity
+        # Display artist name and song name in bold using markdown
+        st.markdown(f"**Track:** {track['name']} \n**Artist:** {track['artists'][0]['name']} (Popularity: {track['popularity']})")
+
+# Add a "Make a Playlist" button
+if st.button('Make a Playlist'):
+    st.write('Playlist creation functionality goes here!')

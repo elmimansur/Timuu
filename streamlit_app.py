@@ -2,6 +2,8 @@ import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import streamlit as st
 import googleapiclient.discovery
+import google_auth_oauthlib.flow
+
 
 # Spotify setup
 client_id = st.secrets["SPOTIFY_CLIENT_ID"]

@@ -1,77 +1,25 @@
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import streamlit as st
-import googleapiclient.discovery
-import google_auth_oauthlib.flow
-from google_auth_oauthlib.flow import Flow
-import googleapiclient.discovery
-
+import os
+from googleapiclient.discovery import build
 
 # Spotify setup
-client_id = st.secrets["SPOTIFY_CLIENT_ID"]
-client_secret = st.secrets["SPOTIFY_CLIENT_SECRET"]
+client_id = os.environ.get('YOUR_CLIENT_ID')
+client_secret = os.environ.get('YOUR_CLIENT_SECRET')
 client_credentials_manager = SpotifyClientCredentials(client_id=client_id, client_secret=client_secret)
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
-# ... and so on for other keys
-
-
-
-
-# Define the scopes
-scopes = ["https://www.googleapis.com/auth/youtube"]
-
-# Create the OAuth flow
-flow = Flow.from_client_config(
-    client_config={
-        "web": st.secrets["web"]
-    },
-    scopes=scopes
-)
-
-# Run the local server flow
-credentials = flow.run_local_server()
-
-# Build the YouTube API client
-youtube = googleapiclient.discovery.build("youtube", "v3", credentials=credentials)
+# YouTube setup
+ydevkey = os.environ.get('YOUR_YOUTUBE_API_KEY')
+youtube = build('youtube', 'v3', developerKey=ydevkey)
 
 def search_youtube(track_name):
+    """Search for a track on YouTube and return the video URL."""
     request = youtube.search().list(q=track_name, part='id', maxResults=1)
     response = request.execute()
     video_id = response['items'][0]['id']['videoId']
-    return video_id
-
-def create_youtube_playlist(title, description=""):
-    request = youtube.playlists().insert(
-        part="snippet,status",
-        body={
-            "snippet": {
-                "title": title,
-                "description": description
-            },
-            "status": {
-                "privacyStatus": "public"
-            }
-        }
-    )
-    response = request.execute()
-    return response["id"]
-
-def add_video_to_playlist(playlist_id, video_id):
-    request = youtube.playlistItems().insert(
-        part="snippet",
-        body={
-            "snippet": {
-                "playlistId": playlist_id,
-                "resourceId": {
-                    "kind": "youtube#video",
-                    "videoId": video_id
-                }
-            }
-        }
-    )
-    response = request.execute()
-    return response
+    return f"https://www.youtube.com/watch?v={video_id}"
 
 st.title("Travel Through Time: A Musical Journey")
 year = st.slider("Select a year to explore music:", 1950, 2020)
@@ -105,12 +53,22 @@ for track in tracks_sorted_by_popularity:
     with col2:
         st.markdown(f"**Track:** {track['name']} \n**Artist:** {track['artists'][0]['name']} (Popularity: {track['popularity']})")
 
-# Add a button in Streamlit to create the YouTube playlist
-if st.button('Make a YouTube Playlist'):
-    playlist_id = create_youtube_playlist(f"Music from {year}")
+# Add a button in Streamlit to create the YouTube mix
+if st.button('Make a YouTube Mix'):
+    video_urls = [search_youtube(f"{track['name']} {track['artists'][0]['name']}") for track in tracks_sorted_by_popularity]
+    for url in video_urls:
+        st.markdown(f'<a href="{url}" target="_blank">{url}</a>', unsafe_allow_html=True)
+
+
+# ... [rest of your code]
+
+# Add a button in Streamlit to create the YouTube mix
+if st.button('Make a YouTube Mix2'):
     video_ids = [search_youtube(f"{track['name']} {track['artists'][0]['name']}") for track in tracks_sorted_by_popularity]
     
-    for video_id in video_ids:
-        add_video_to_playlist(playlist_id, video_id)
+    # Create a YouTube mix URL
+    first_video_url = f"https://www.youtube.com/watch?v={video_ids[0]}"
+    rest_of_videos = ','.join(video_ids[1:])
+    mix_url = f"{first_video_url}&list={rest_of_videos}"
     
-    st.markdown(f'YouTube playlist created! [View Playlist](https://www.youtube.com/playlist?list={playlist_id})', unsafe_allow_html=True)
+    st.markdown(f'<a href="{mix_url}" target="_blank"><button>Open YouTube Mix</button></a>', unsafe_allow_html=True)
